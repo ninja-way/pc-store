@@ -21,9 +21,15 @@ func New(addr string, handler http.Handler, db repository.Repository) *Server {
 	}
 }
 
-func (s Server) Run() error {
-	log.Println("Server running...")
+func (s Server) installHandlers() {
 	http.HandleFunc("/computers", s.getComputers)
+	http.HandleFunc("/computer", s.addComputer)
+	http.HandleFunc("/computer/", s.manageComputer)
+}
+
+func (s Server) Run() error {
+	s.installHandlers()
+	log.Println("Server running...")
 
 	if err := s.s.ListenAndServe(); err != nil {
 		return err
