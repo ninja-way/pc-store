@@ -73,14 +73,42 @@ func (s Server) manageComputer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s Server) getComputer(w http.ResponseWriter, r *http.Request, id int) {
-	_, _ = w.Write([]byte("get"))
+func (s Server) getComputer(w http.ResponseWriter, _ *http.Request, id int) {
+	pc, err := s.db.GetComputerByID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	res, err := json.Marshal(pc)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = w.Write(res)
 }
 
 func (s Server) updateComputer(w http.ResponseWriter, r *http.Request, id int) {
-	_, _ = w.Write([]byte("update"))
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var newPC model.PC
+	if err = json.Unmarshal(body, &newPC); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err = s.db.UpdateComputer(id, newPC); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }
 
-func (s Server) deleteComputer(w http.ResponseWriter, r *http.Request, id int) {
-	_, _ = w.Write([]byte("delete"))
+func (s Server) deleteComputer(w http.ResponseWriter, _ *http.Request, id int) {
+	if err := s.db.DeleteComputer(id); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }

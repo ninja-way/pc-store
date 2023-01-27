@@ -1,7 +1,7 @@
 package model
 
 type Store struct {
-	Name      string
-	Phone     string
-	Computers []PC
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
+	Computers []PC   `json:"computers"`
 }

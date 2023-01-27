@@ -1,11 +1,11 @@
 package model
 
 type PC struct {
-	ID          int
-	Name        string
-	CPU         string
-	Videocard   string
-	RAM         int
-	DataStorage string
-	Price       int
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	CPU         string `json:"cpu"`
+	Videocard   string `json:"videocard"`
+	RAM         int    `json:"ram"`
+	DataStorage string `json:"data_storage"`
+	Price       int    `json:"price"`
 }
