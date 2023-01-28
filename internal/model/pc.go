@@ -9,6 +9,6 @@ type PC struct {
 	Videocard   string    `json:"videocard,omitempty"`
 	RAM         int       `json:"ram"`
 	DataStorage string    `json:"data_storage,omitempty"`
-	AddedAt     time.Time `json:"added_at,omitempty"`
+	AddedAt     time.Time `json:"added_at"`
 	Price       int       `json:"price"`
 }
