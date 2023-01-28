@@ -4,13 +4,14 @@ import (
 	"errors"
 	"github.com/ninja-way/pc-store/internal/model"
 	"github.com/ninja-way/pc-store/internal/repository"
+	"time"
 )
 
 type Cache struct {
 	data *[]model.PC
 }
 
-func Init() repository.Repository {
+func Init() repository.DB {
 	return Cache{data: &[]model.PC{}}
 }
 
@@ -29,6 +30,7 @@ func (c Cache) GetComputerByID(id int) (model.PC, error) {
 
 func (c Cache) AddComputer(pc model.PC) error {
 	pc.ID = len(*c.data) + 1
+	pc.AddedAt = time.Now().Format("02-01-2006")
 	*c.data = append(*c.data, pc)
 	return nil
 }
