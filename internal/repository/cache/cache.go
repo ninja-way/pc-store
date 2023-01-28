@@ -30,7 +30,7 @@ func (c Cache) GetComputerByID(id int) (model.PC, error) {
 
 func (c Cache) AddComputer(pc model.PC) error {
 	pc.ID = len(*c.data) + 1
-	pc.AddedAt = time.Now().Format("02-01-2006")
+	pc.AddedAt = time.Now()
 	*c.data = append(*c.data, pc)
 	return nil
 }

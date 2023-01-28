@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/ninja-way/pc-store/internal/middleware"
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/server"
@@ -9,7 +10,8 @@ import (
 )
 
 func main() {
-	db, err := postgres.Init()
+	ctx := context.Background()
+	db, err := postgres.Init(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
