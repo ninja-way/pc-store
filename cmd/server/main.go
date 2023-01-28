@@ -1,10 +1,12 @@
 package main
 
 import (
+	"github.com/ninja-way/pc-store/internal/middleware"
 	"github.com/ninja-way/pc-store/internal/model"
 	"github.com/ninja-way/pc-store/internal/repository/cache"
 	"github.com/ninja-way/pc-store/internal/server"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -13,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s := server.New(":8080", nil, db)
+	s := server.New(":8080", middleware.Logging(http.DefaultServeMux), db)
 
 	if err := s.Run(); err != nil {
 		log.Fatal(err)
