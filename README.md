@@ -1,7 +1,7 @@
 # pc-store
 CRUD server providing the computer store API
 
-### Run
+### Run server
 ```
  go build ./cmd/server
 ```
@@ -22,6 +22,7 @@ CRUD server providing the computer store API
  {"id":2,"name":"Basic office PC","cpu":"Pentium n5000","ram":8, 
   "data_storage":"hdd 512mb","added_at":"2023-01-30T00:20:49.635803Z","price":6999}]
 ```
+
 ---
 
 + **PUT /computer**  
@@ -34,6 +35,7 @@ CRUD server providing the computer store API
 
 ***Response:*** `200 OK`  
 Return `400 Bad Request` if the request body contains error.
+
 ---
 
 + **GET /computer/{id}**  
@@ -57,15 +59,17 @@ Return `404 Not Found` if there is no record with this `id`.
 ***Response:*** `200 OK`  
 Return `400 Bad Request` if the request body contains error.   
 Return `404 Not Found` if there is no record with this `id`.
+
 ---
 
 + **DELETE /computer/{id}**
 
 ***Response:*** `200 OK`  
 Return `404 Not Found` if there is no record with this `id`.
+
 ---
 
-### Run server example
+### Server example
 ```go
 package main
 
@@ -96,3 +100,4 @@ func main() {
 	}
 }
 ```
+![example running](./cmd/server/example.png "example running")
