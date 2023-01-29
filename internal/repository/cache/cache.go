@@ -1,18 +1,25 @@
 package cache
 
 import (
+	"context"
 	"errors"
 	"github.com/ninja-way/pc-store/internal/model"
 	"github.com/ninja-way/pc-store/internal/repository"
 	"time"
 )
 
+// Cache is temporary repository until postgres has been added
 type Cache struct {
 	data *[]model.PC
 }
 
 func Init() repository.DB {
 	return Cache{data: &[]model.PC{}}
+}
+
+func (c Cache) Close(_ context.Context) error {
+	// nothing to implement
+	return nil
 }
 
 func (c Cache) GetComputers() ([]model.PC, error) {

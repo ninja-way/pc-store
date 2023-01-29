@@ -11,18 +11,17 @@ import (
 
 func main() {
 	ctx := context.Background()
+
+	// connect to database
 	db, err := postgres.Init(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//db := cache.Init()
-	//if err := db.AddComputer(model.PC{Name: "Test PC", Price: 19999}); err != nil {
-	//	log.Fatal(err)
-	//}
-
+	// setup server with logging
 	s := server.New(":8080", middleware.Logging(http.DefaultServeMux), db)
 
+	// start server
 	if err = s.Run(); err != nil {
 		log.Fatal(err)
 	}

@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+// Get method which returns all pc from database
 func (s Server) getComputers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusNotImplemented)
@@ -30,6 +31,7 @@ func (s Server) getComputers(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(res)
 }
 
+// Put method which add new pc from request body to database
 func (s Server) addComputer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		w.WriteHeader(http.StatusNotImplemented)
@@ -54,6 +56,7 @@ func (s Server) addComputer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Manage check which method came to the same ID endpoint and parse ID
 func (s Server) manageComputer(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(path.Base(r.RequestURI))
 	if err != nil {
@@ -73,6 +76,7 @@ func (s Server) manageComputer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Get method which return pc from database by id
 func (s Server) getComputer(w http.ResponseWriter, _ *http.Request, id int) {
 	pc, err := s.db.GetComputerByID(id)
 	if err != nil {
@@ -89,6 +93,7 @@ func (s Server) getComputer(w http.ResponseWriter, _ *http.Request, id int) {
 	_, _ = w.Write(res)
 }
 
+// Post method which update existing pc in database by id and new data from request body
 func (s Server) updateComputer(w http.ResponseWriter, r *http.Request, id int) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -107,6 +112,7 @@ func (s Server) updateComputer(w http.ResponseWriter, r *http.Request, id int) {
 	}
 }
 
+// Delete method which delete pc from database by id
 func (s Server) deleteComputer(w http.ResponseWriter, _ *http.Request, id int) {
 	if err := s.db.DeleteComputer(id); err != nil {
 		w.WriteHeader(http.StatusNotFound)
