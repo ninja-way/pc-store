@@ -8,10 +8,10 @@ import (
 
 type Server struct {
 	s  *http.Server
-	db repository.Repository
+	db repository.DB
 }
 
-func New(addr string, handler http.Handler, db repository.Repository) *Server {
+func New(addr string, handler http.Handler, db repository.DB) *Server {
 	return &Server{
 		s: &http.Server{
 			Addr:    addr,

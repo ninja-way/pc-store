@@ -76,7 +76,7 @@ func (s Server) manageComputer(w http.ResponseWriter, r *http.Request) {
 func (s Server) getComputer(w http.ResponseWriter, _ *http.Request, id int) {
 	pc, err := s.db.GetComputerByID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -103,12 +103,12 @@ func (s Server) updateComputer(w http.ResponseWriter, r *http.Request, id int) {
 	}
 
 	if err = s.db.UpdateComputer(id, newPC); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
 func (s Server) deleteComputer(w http.ResponseWriter, _ *http.Request, id int) {
 	if err := s.db.DeleteComputer(id); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 	}
 }

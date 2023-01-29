@@ -2,7 +2,7 @@ package repository
 
 import "github.com/ninja-way/pc-store/internal/model"
 
-type Repository interface {
+type DB interface {
 	GetComputers() ([]model.PC, error)
 	GetComputerByID(int) (model.PC, error)
 	AddComputer(model.PC) error
