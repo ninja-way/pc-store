@@ -45,6 +45,7 @@ Return `400 Bad Request` if the request body contains error.
 {"id":1,"name":"Pro gaming ASUS","cpu":"Core i3-10100f","videocard":"RTX 2060s",
   "ram":16,"data_storage":"hdd 1tb","added_at":"2023-01-29T16:38:50.550613Z","price":17999}
 ```
+Return `400 Bad Request` if id is invalid.  
 Return `404 Not Found` if there is no record with this `id`.  
 
 ---
@@ -57,7 +58,7 @@ Return `404 Not Found` if there is no record with this `id`.
 ```
 
 ***Response:*** `200 OK`  
-Return `400 Bad Request` if the request body contains error.   
+Return `400 Bad Request` if the request body contains error or id is invalid.   
 Return `404 Not Found` if there is no record with this `id`.
 
 ---
@@ -65,6 +66,7 @@ Return `404 Not Found` if there is no record with this `id`.
 + **DELETE /computer/{id}**
 
 ***Response:*** `200 OK`  
+Return `400 Bad Request` if id is invalid.  
 Return `404 Not Found` if there is no record with this `id`.
 
 ---
