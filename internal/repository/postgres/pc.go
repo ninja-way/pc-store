@@ -5,9 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
-	"github.com/ninja-way/pc-store/internal/model"
+	"github.com/ninja-way/pc-store/internal/models"
 	"github.com/ninja-way/pc-store/internal/repository"
-	"time"
 )
 
 // db config
@@ -19,14 +18,13 @@ const (
 	dbname   = "pcstore"
 )
 
-// PG implements DB interface
+// PG is postgres connection implements DB interface
 type PG struct {
-	ctx  context.Context
 	conn *pgx.Conn
 }
 
-// Init makes connection to the database with the passed context
-func Init(ctx context.Context) (repository.DB, error) {
+// Connect makes connection to the database with the passed context
+func Connect(ctx context.Context) (repository.DB, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%d dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
@@ -35,10 +33,7 @@ func Init(ctx context.Context) (repository.DB, error) {
 		return nil, err
 	}
 
-	return &PG{
-		ctx:  ctx,
-		conn: conn,
-	}, nil
+	return &PG{conn: conn}, nil
 }
 
 // Close postgres db connection
@@ -47,16 +42,16 @@ func (p *PG) Close(ctx context.Context) error {
 }
 
 // GetComputers return all pc from db
-func (p *PG) GetComputers() ([]model.PC, error) {
-	rows, err := p.conn.Query(p.ctx, "select * from pc")
+func (p *PG) GetComputers(ctx context.Context) ([]models.PC, error) {
+	rows, err := p.conn.Query(ctx, "select * from pc")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	computers := make([]model.PC, 0)
+	computers := make([]models.PC, 0)
 	for rows.Next() {
-		pc := model.PC{}
+		pc := models.PC{}
 		err = rows.Scan(&pc.ID, &pc.Name, &pc.CPU, &pc.Videocard, &pc.RAM,
 			&pc.DataStorage, &pc.AddedAt, &pc.Price)
 		if err != nil {
@@ -73,13 +68,13 @@ func (p *PG) GetComputers() ([]model.PC, error) {
 }
 
 // GetComputerByID return pc by id from db
-func (p *PG) GetComputerByID(id int) (model.PC, error) {
-	var pc model.PC
+func (p *PG) GetComputerByID(ctx context.Context, id int) (models.PC, error) {
+	var pc models.PC
 
-	err := p.conn.QueryRow(p.ctx, "select * from pc where id = $1", id).
+	err := p.conn.QueryRow(ctx, "select * from pc where id = $1", id).
 		Scan(&pc.ID, &pc.Name, &pc.CPU, &pc.Videocard, &pc.RAM, &pc.DataStorage, &pc.AddedAt, &pc.Price)
 	if err != nil {
-		return model.PC{}, err
+		return models.PC{}, err
 	}
 
 	return pc, nil
@@ -87,20 +82,15 @@ func (p *PG) GetComputerByID(id int) (model.PC, error) {
 
 // AddComputer insert passed pc into db
 // if AddedAt value not specified, sets the current time
-func (p *PG) AddComputer(pc model.PC) error {
-	if pc.AddedAt.IsZero() {
-		pc.AddedAt = time.Now()
-	}
-
-	_, err := p.conn.Exec(p.ctx, "insert into pc (name, cpu, videocard, ram, data_storage, added_at, price) "+
-		"values ($1, $2, $3, $4, $5, $6, $7)",
-		pc.Name, pc.CPU, pc.Videocard, pc.RAM, pc.DataStorage, pc.AddedAt, pc.Price)
+func (p *PG) AddComputer(ctx context.Context, pc models.PC) error {
+	var insertQuery = "insert into pc (name, cpu, videocard, ram, data_storage, added_at, price) values ($1, $2, $3, $4, $5, $6, $7)"
+	_, err := p.conn.Exec(ctx, insertQuery, pc.Name, pc.CPU, pc.Videocard, pc.RAM, pc.DataStorage, pc.AddedAt, pc.Price)
 
 	return err
 }
 
 // UpdateComputer changes only the specified fields in the PC in computer with passed id
-func (p *PG) UpdateComputer(id int, newPC model.PC) error {
+func (p *PG) UpdateComputer(ctx context.Context, id int, newPC models.PC) error {
 	var newParam = make(map[string]interface{})
 
 	if newPC.Name != "" {
@@ -122,8 +112,8 @@ func (p *PG) UpdateComputer(id int, newPC model.PC) error {
 		newParam["price"] = newPC.Price
 	}
 
-	for i, v := range newParam {
-		if _, err := p.conn.Exec(p.ctx, "update pc set "+i+"=$1 where id = $2", v, id); err != nil {
+	for param, val := range newParam {
+		if _, err := p.conn.Exec(ctx, "update pc set "+param+"=$1 where id = $2", val, id); err != nil {
 			return err
 		}
 	}
@@ -131,8 +121,8 @@ func (p *PG) UpdateComputer(id int, newPC model.PC) error {
 }
 
 // DeleteComputer from db by id
-func (p *PG) DeleteComputer(id int) error {
-	t, err := p.conn.Exec(p.ctx, "delete from pc where id = $1", id)
+func (p *PG) DeleteComputer(ctx context.Context, id int) error {
+	t, err := p.conn.Exec(ctx, "delete from pc where id = $1", id)
 	if t.RowsAffected() == 0 {
 		return errors.New("no rows in result set")
 	}
