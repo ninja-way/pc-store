@@ -1,8 +1,7 @@
-package server
+package transport
 
 import (
 	"context"
-	"github.com/ninja-way/pc-store/internal/repository"
 	"log"
 	"net/http"
 	"os"
@@ -14,30 +13,30 @@ import (
 // Server stores the config and connected database
 type Server struct {
 	s      *http.Server
-	db     repository.DB
+	h      *Handler
 	errors chan error
 }
 
-// New is server constructor
-func New(addr string, handler http.Handler, db repository.DB) *Server {
+// NewServer is server constructor
+func NewServer(addr string, mw http.Handler, h *Handler) *Server {
 	return &Server{
 		s: &http.Server{
 			Addr:    addr,
-			Handler: handler,
+			Handler: mw,
 		},
-		db:     db,
+		h:      h,
 		errors: make(chan error),
 	}
 }
 
-func (s Server) setupHandlers() {
-	http.HandleFunc("/computers", s.getComputers)
-	http.HandleFunc("/computer", s.addComputer)
-	http.HandleFunc("/computer/", s.manageComputer)
+func (s *Server) setupHandlers() {
+	http.HandleFunc("/computers", s.h.getComputers)
+	http.HandleFunc("/computer", s.h.addComputer)
+	http.HandleFunc("/computer/", s.h.manageComputer)
 }
 
 // Run configures and starts the server
-func (s Server) Run() error {
+func (s *Server) Run() error {
 	s.setupHandlers()
 
 	go func() {
@@ -64,9 +63,7 @@ func (s Server) Run() error {
 }
 
 // Shuts down the server and close db connection
-func (s Server) stop() {
-	log.Println("Server stopping...")
-
+func (s *Server) stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -74,9 +71,6 @@ func (s Server) stop() {
 		log.Printf("Server Shutdown: %v", err)
 	}
 
-	if err := s.db.Close(ctx); err != nil {
-		log.Printf("Database closing: %v", err)
-	}
-
-	close(s.errors)
+	//close(s.errors)
+	log.Println("Server stopped")
 }
