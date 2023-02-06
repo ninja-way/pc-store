@@ -2,10 +2,18 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/ninja-way/pc-store/internal/models"
 	"time"
 )
 
+/******** Business logic layer *********/
+
+const MaxPCPrice = 1_000_000
+
+var ErrPriceTooHigh = errors.New("pc price too high")
+
+// ComputerRepository is data layer entity
 type ComputerRepository interface {
 	GetComputers(context.Context) ([]models.PC, error)
 	GetComputerByID(context.Context, int) (models.PC, error)
@@ -33,6 +41,11 @@ func (c *ComputersStore) GetComputerByID(ctx context.Context, i int) (models.PC,
 }
 
 func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) error {
+	if pc.Price > MaxPCPrice {
+		return ErrPriceTooHigh
+	}
+
+	// if AddedAt value not specified, sets the current time
 	if pc.AddedAt.IsZero() {
 		pc.AddedAt = time.Now()
 	}
@@ -41,6 +54,9 @@ func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) error {
 }
 
 func (c *ComputersStore) UpdateComputer(ctx context.Context, i int, pc models.PC) error {
+	if pc.Price > MaxPCPrice {
+		return ErrPriceTooHigh
+	}
 	return c.repo.UpdateComputer(ctx, i, pc)
 }
 
