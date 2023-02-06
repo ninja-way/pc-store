@@ -32,7 +32,7 @@ func NewHandler(service ComputersStore) *Handler {
 // InitRouter setup handlers
 func (h *Handler) InitRouter() *gin.Engine {
 	// disable debug info
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.New()
 	r.Use(middleware.Logging())
