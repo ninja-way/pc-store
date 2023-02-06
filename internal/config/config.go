@@ -11,13 +11,14 @@ type Config struct {
 }
 
 type Server struct {
-	Port int `mapstructure:"port"`
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 type Postgres struct {
 	Host     string
 	Port     int
-	User     string
+	UserName string
 	Password string
 	SSLMode  string
 	DBName   string

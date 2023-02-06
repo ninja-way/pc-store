@@ -5,12 +5,16 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ninja-way/pc-store/internal/models"
+	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport/middleware"
 	"log"
 	"net/http"
 	"strconv"
 )
 
+/******** Transport layer *********/
+
+// ComputersStore is service layer entity
 type ComputersStore interface {
 	GetComputers(context.Context) ([]models.PC, error)
 	GetComputerByID(context.Context, int) (models.PC, error)
@@ -29,7 +33,7 @@ func NewHandler(service ComputersStore) *Handler {
 	}
 }
 
-// InitRouter setup handlers
+// InitRouter setup endpoints
 func (h *Handler) InitRouter() *gin.Engine {
 	// disable debug info
 	gin.SetMode(gin.ReleaseMode)
@@ -71,6 +75,10 @@ func (h *Handler) addComputer(c *gin.Context) {
 	}
 
 	if err := h.service.AddComputer(c, newPC); err != nil {
+		if errors.Is(err, service.ErrPriceTooHigh) {
+			c.Status(http.StatusBadRequest)
+			return
+		}
 		log.Println("AddComputer error:", err)
 		c.Status(http.StatusInternalServerError)
 	}
@@ -108,6 +116,10 @@ func (h *Handler) updateComputer(c *gin.Context) {
 	}
 
 	if err = h.service.UpdateComputer(c, id, newPC); err != nil {
+		if errors.Is(err, service.ErrPriceTooHigh) {
+			c.Status(http.StatusBadRequest)
+			return
+		}
 		c.Status(http.StatusNotFound)
 	}
 }

@@ -9,12 +9,11 @@ import (
 	"time"
 )
 
-// Server stores the config and connected database
+// Server with custom gin router
 type Server struct {
 	s *http.Server
 }
 
-// NewServer is server constructor
 func NewServer(addr string, handler http.Handler) *Server {
 	return &Server{
 		s: &http.Server{
