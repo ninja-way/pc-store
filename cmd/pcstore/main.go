@@ -10,13 +10,11 @@ import (
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 const (
 	ConfigDir  = "configs"
 	ConfigFile = "main"
-	LogFile    = "pcstore.log"
 )
 
 var cfg *config.Config
@@ -34,21 +32,7 @@ func init() {
 		log.WithField("init config", err).Fatal()
 	}
 
-	if cfg.Environment == "prod" {
-		log.SetFormatter(&log.JSONFormatter{})
-
-		logf, err := os.OpenFile(LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
-		if err != nil {
-			log.Fatal("failed open log file")
-		}
-		log.SetOutput(logf)
-
-		log.SetLevel(log.WarnLevel)
-	} else {
-		log.SetFormatter(&log.TextFormatter{})
-		log.SetOutput(os.Stdout)
-		log.SetLevel(log.DebugLevel)
-	}
+	config.SetupLogger(cfg)
 }
 
 func main() {
@@ -66,7 +50,7 @@ func main() {
 	compStore := service.NewComputersStore(c, cfg, db)
 	handler := transport.NewHandler(compStore)
 
-	// setup and run server
+	// setup and run pcstore
 	transport.NewServer(
 		fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
 		handler.InitRouter(),
