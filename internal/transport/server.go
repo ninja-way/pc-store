@@ -2,7 +2,7 @@ package transport
 
 import (
 	"context"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os/signal"
 	"syscall"
@@ -32,10 +32,10 @@ func (s *Server) Run() {
 	// run server
 	go func() {
 		if err := s.s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Listen: %s\n", err)
+			log.WithField("listen server", err).Fatal()
 		}
 	}()
-	log.Println("Server running...")
+	log.Warn("Server running...")
 
 	<-ctx.Done()
 	cancel()
@@ -45,8 +45,8 @@ func (s *Server) Run() {
 	defer cancel()
 
 	if err := s.s.Shutdown(ctx); err != nil {
-		log.Printf("Server Shutdown: %v", err)
+		log.WithField("server shutdown", err).Warn()
 	}
 
-	log.Println("Server stopped")
+	log.Warn("Server stopped.")
 }

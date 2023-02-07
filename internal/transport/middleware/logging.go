@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -14,7 +14,7 @@ func Logging() gin.HandlerFunc {
 		// after request
 		latency := time.Since(t)
 
-		log.Printf("[%d] %s %s | %s",
+		log.Infof("[%d] %s %s | %s",
 			c.Writer.Status(),
 			c.Request.Method,
 			c.Request.RequestURI,
