@@ -12,6 +12,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//	@title		Computer store API
+//	@version	v1.6.0
+//
+//	@host		localhost:8080
+//	@BasePath	/
+
 const (
 	ConfigDir  = "configs"
 	ConfigFile = "main"

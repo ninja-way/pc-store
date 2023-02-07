@@ -7,3 +7,7 @@ build:
 
 run: build
 	./.bin/pcstore
+
+swag:
+	swag fmt
+	swag init -g cmd/pcstore/main.go
