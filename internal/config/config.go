@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	DB     Postgres
-	Server Server `mapstructure:"server"`
+	DB          Postgres
+	Environment string `mapstructure:"environment"`
+	Server      Server `mapstructure:"server"`
 }
 
 type Server struct {

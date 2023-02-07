@@ -7,7 +7,7 @@ import (
 	"github.com/ninja-way/pc-store/internal/models"
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport/middleware"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -58,7 +58,10 @@ func (h *Handler) InitRouter() *gin.Engine {
 func (h *Handler) getComputers(c *gin.Context) {
 	comps, err := h.service.GetComputers(c)
 	if err != nil {
-		log.Println("GetComputers error:", err)
+		log.WithFields(log.Fields{
+			"handler": "getComputers",
+			"problem": "get all pc from service",
+		}).Error(err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -70,16 +73,28 @@ func (h *Handler) getComputers(c *gin.Context) {
 func (h *Handler) addComputer(c *gin.Context) {
 	var newPC models.PC
 	if err := c.BindJSON(&newPC); err != nil {
+		log.WithFields(log.Fields{
+			"handler": "addComputer",
+			"problem": "read or unmarshal request body",
+		}).Debug(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	if err := h.service.AddComputer(c, newPC); err != nil {
 		if errors.Is(err, service.ErrPriceTooHigh) {
+			log.WithFields(log.Fields{
+				"handler": "addComputer",
+				"problem": "specified price too high",
+			}).Debug(err)
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		log.Println("AddComputer error:", err)
+
+		log.WithFields(log.Fields{
+			"handler": "addComputer",
+			"problem": "add pc to service",
+		}).Error(err)
 		c.Status(http.StatusInternalServerError)
 	}
 }
@@ -88,12 +103,20 @@ func (h *Handler) addComputer(c *gin.Context) {
 func (h *Handler) getComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "getComputer",
+			"problem": "bad id passed",
+		}).Debug(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	pc, err := h.service.GetComputerByID(c, id)
 	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "getComputer",
+			"problem": "pc with passed id not found",
+		}).Debug(err)
 		c.Status(http.StatusNotFound)
 		return
 	}
@@ -105,21 +128,37 @@ func (h *Handler) getComputer(c *gin.Context) {
 func (h *Handler) updateComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "updateComputer",
+			"problem": "bad id passed",
+		}).Debug(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	var newPC models.PC
 	if err = c.BindJSON(&newPC); err != nil {
+		log.WithFields(log.Fields{
+			"handler": "updateComputer",
+			"problem": "read or unmarshal request body",
+		}).Debug(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	if err = h.service.UpdateComputer(c, id, newPC); err != nil {
 		if errors.Is(err, service.ErrPriceTooHigh) {
+			log.WithFields(log.Fields{
+				"handler": "updateComputer",
+				"problem": "specified price too high",
+			}).Debug(err)
 			c.Status(http.StatusBadRequest)
 			return
 		}
+		log.WithFields(log.Fields{
+			"handler": "updateComputer",
+			"problem": "pc with passed id not found",
+		}).Debug(err)
 		c.Status(http.StatusNotFound)
 	}
 }
@@ -128,11 +167,19 @@ func (h *Handler) updateComputer(c *gin.Context) {
 func (h *Handler) deleteComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "deleteComputer",
+			"problem": "bad id passed",
+		}).Debug(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	if err = h.service.DeleteComputer(c, id); err != nil {
+		log.WithFields(log.Fields{
+			"handler": "deleteComputer",
+			"problem": "pc with passed id not found",
+		}).Debug(err)
 		c.Status(http.StatusNotFound)
 	}
 }

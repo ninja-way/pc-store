@@ -8,33 +8,55 @@ import (
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 const (
-	CONFIG_DIR  = "configs"
-	CONFIG_FILE = "main"
+	ConfigDir  = "configs"
+	ConfigFile = "main"
+	LogFile    = "pcstore.log"
 )
 
-func main() {
+var cfg *config.Config
+
+func init() {
 	// load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.WithField("loading .env file", err).Fatal()
 	}
 
 	// init config
-	cfg, err := config.New(CONFIG_DIR, CONFIG_FILE)
+	cfg, err = config.New(ConfigDir, ConfigFile)
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("init config", err).Fatal()
 	}
 
+	if cfg.Environment == "prod" {
+		log.SetFormatter(&log.JSONFormatter{})
+
+		logf, err := os.OpenFile(LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+		if err != nil {
+			log.Fatal("failed open log file")
+		}
+		log.SetOutput(logf)
+
+		log.SetLevel(log.WarnLevel)
+	} else {
+		log.SetFormatter(&log.TextFormatter{})
+		log.SetOutput(os.Stdout)
+		log.SetLevel(log.DebugLevel)
+	}
+}
+
+func main() {
 	ctx := context.Background()
 
 	// connect to database
 	db, err := postgres.Connect(ctx, &cfg.DB)
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("connect to postgres", err).Fatal()
 	}
 	defer db.Close(ctx)
 

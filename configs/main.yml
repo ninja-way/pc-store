@@ -1,3 +1,4 @@
+environment: prod
 server:
   host: localhost
   port: 8080
