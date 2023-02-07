@@ -73,11 +73,14 @@ func (p *PG) GetComputerByID(ctx context.Context, id int) (models.PC, error) {
 }
 
 // AddComputer insert passed pc into db
-func (p *PG) AddComputer(ctx context.Context, pc models.PC) error {
-	var insertQuery = "insert into pc (name, cpu, videocard, ram, data_storage, added_at, price) values ($1, $2, $3, $4, $5, $6, $7)"
-	_, err := p.conn.Exec(ctx, insertQuery, pc.Name, pc.CPU, pc.Videocard, pc.RAM, pc.DataStorage, pc.AddedAt, pc.Price)
+func (p *PG) AddComputer(ctx context.Context, pc models.PC) (int, error) {
+	var id int
 
-	return err
+	var insertQuery = "insert into pc (name, cpu, videocard, ram, data_storage, added_at, price) values ($1, $2, $3, $4, $5, $6, $7) returning id"
+	row := p.conn.QueryRow(ctx, insertQuery, pc.Name, pc.CPU, pc.Videocard, pc.RAM, pc.DataStorage, pc.AddedAt, pc.Price)
+
+	err := row.Scan(&id)
+	return id, err
 }
 
 // UpdateComputer changes only the specified fields in the PC in computer with passed id

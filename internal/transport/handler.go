@@ -18,7 +18,7 @@ import (
 type ComputersStore interface {
 	GetComputers(context.Context) ([]models.PC, error)
 	GetComputerByID(context.Context, int) (models.PC, error)
-	AddComputer(context.Context, models.PC) error
+	AddComputer(context.Context, models.PC) (int, error)
 	UpdateComputer(context.Context, int, models.PC) error
 	DeleteComputer(context.Context, int) error
 }
@@ -81,11 +81,12 @@ func (h *Handler) addComputer(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.AddComputer(c, newPC); err != nil {
-		if errors.Is(err, service.ErrPriceTooHigh) {
+	id, err := h.service.AddComputer(c, newPC)
+	if err != nil {
+		if errors.Is(err, service.ErrPriceTooHigh) || errors.Is(err, service.ErrFewComponents) {
 			log.WithFields(log.Fields{
 				"handler": "addComputer",
-				"problem": "specified price too high",
+				"problem": "bad request body",
 			}).Debug(err)
 			c.Status(http.StatusBadRequest)
 			return
@@ -97,6 +98,10 @@ func (h *Handler) addComputer(c *gin.Context) {
 		}).Error(err)
 		c.Status(http.StatusInternalServerError)
 	}
+
+	c.JSON(http.StatusOK, struct {
+		ID int `json:"id"`
+	}{id})
 }
 
 // Get method which return pc from database by id

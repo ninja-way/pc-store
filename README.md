@@ -34,6 +34,9 @@ CRUD server providing the computer store API
 ```
 
 ***Response:*** `200 OK`  
+```json
+{"id":1}
+```
 Return `400 Bad Request` if the request body contains error.
 
 ---

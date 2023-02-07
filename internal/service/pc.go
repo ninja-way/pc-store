@@ -11,13 +11,16 @@ import (
 
 const MaxPCPrice = 1_000_000
 
-var ErrPriceTooHigh = errors.New("pc price too high")
+var (
+	ErrPriceTooHigh  = errors.New("pc price too high")
+	ErrFewComponents = errors.New("not all pc components listed")
+)
 
 // ComputerRepository is data layer entity
 type ComputerRepository interface {
 	GetComputers(context.Context) ([]models.PC, error)
 	GetComputerByID(context.Context, int) (models.PC, error)
-	AddComputer(context.Context, models.PC) error
+	AddComputer(context.Context, models.PC) (int, error)
 	UpdateComputer(context.Context, int, models.PC) error
 	DeleteComputer(context.Context, int) error
 }
@@ -40,9 +43,13 @@ func (c *ComputersStore) GetComputerByID(ctx context.Context, i int) (models.PC,
 	return c.repo.GetComputerByID(ctx, i)
 }
 
-func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) error {
+func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) (int, error) {
 	if pc.Price > MaxPCPrice {
-		return ErrPriceTooHigh
+		return 0, ErrPriceTooHigh
+	}
+
+	if pc.Name == "" || pc.CPU == "" || pc.RAM == 0 || pc.Price == 0 {
+		return 0, ErrFewComponents
 	}
 
 	// if AddedAt value not specified, sets the current time
