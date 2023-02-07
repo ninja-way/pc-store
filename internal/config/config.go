@@ -3,12 +3,16 @@ package config
 import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"
+	"time"
 )
 
 type Config struct {
-	DB          Postgres
-	Environment string `mapstructure:"environment"`
-	Server      Server `mapstructure:"server"`
+	DB Postgres
+
+	Environment string        `mapstructure:"environment"`
+	CacheTTL    time.Duration `mapstructure:"cache_ttl"`
+
+	Server Server `mapstructure:"server"`
 }
 
 type Server struct {

@@ -85,31 +85,9 @@ func (p *PG) AddComputer(ctx context.Context, pc models.PC) (int, error) {
 
 // UpdateComputer changes only the specified fields in the PC in computer with passed id
 func (p *PG) UpdateComputer(ctx context.Context, id int, newPC models.PC) error {
-	var newParam = make(map[string]interface{})
-
-	if newPC.Name != "" {
-		newParam["name"] = newPC.Name
-	}
-	if newPC.CPU != "" {
-		newParam["cpu"] = newPC.CPU
-	}
-	if newPC.Videocard != "" {
-		newParam["videocard"] = newPC.Videocard
-	}
-	if newPC.RAM != 0 {
-		newParam["ram"] = newPC.RAM
-	}
-	if newPC.DataStorage != "" {
-		newParam["data_storage"] = newPC.DataStorage
-	}
-	if newPC.Price != 0 {
-		newParam["price"] = newPC.Price
-	}
-
-	for param, val := range newParam {
-		if _, err := p.conn.Exec(ctx, "update pc set "+param+"=$1 where id = $2", val, id); err != nil {
-			return err
-		}
+	if _, err := p.conn.Exec(ctx, "update pc set name=$1, cpu=$2, videocard=$3, ram=$4, data_storage=$5, price=$6 where id = $7",
+		newPC.Name, newPC.CPU, newPC.Videocard, newPC.RAM, newPC.DataStorage, newPC.Price, id); err != nil {
+		return err
 	}
 	return nil
 }

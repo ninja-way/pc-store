@@ -1,4 +1,7 @@
 environment: prod
+
+cache_ttl: 60s
+
 server:
   host: localhost
   port: 8080

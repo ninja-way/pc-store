@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/ninja-way/cache-ninja/pkg/cache"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/service"
@@ -61,7 +62,8 @@ func main() {
 	defer db.Close(ctx)
 
 	// init service and http handler
-	compStore := service.NewComputersStore(db)
+	c := cache.New()
+	compStore := service.NewComputersStore(c, cfg, db)
 	handler := transport.NewHandler(compStore)
 
 	// setup and run server
