@@ -12,7 +12,7 @@ import (
 
 /******** Business logic layer *********/
 
-const MaxPCPrice = 10_000_000
+const MaxPCPrice = 10000000
 
 var (
 	ErrPriceTooHigh  = errors.New("pc price too high")

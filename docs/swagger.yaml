@@ -1,0 +1,158 @@
+basePath: /
+definitions:
+  models.PC:
+    properties:
+      added_at:
+        example: "2023-01-01T00:00:00.00000Z"
+        type: string
+      cpu:
+        example: i9
+        type: string
+      data_storage:
+        example: ssd 1tb
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Super PC
+        type: string
+      price:
+        example: 79999
+        type: integer
+      ram:
+        example: 32
+        type: integer
+      videocard:
+        example: RTX
+        type: string
+    type: object
+  transport.IDResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Computer store API
+  version: v1.6.0
+paths:
+  /computer:
+    put:
+      consumes:
+      - application/json
+      description: Add new pc from request body to database
+      parameters:
+      - description: computer and its accessories
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.PC'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transport.IDResponse'
+        "400":
+          description: bad request body
+        "500":
+          description: add pc to database error
+      summary: Add Computer
+      tags:
+      - computer
+  /computer/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete pc from database by id
+      parameters:
+      - description: Computer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pc deleted
+        "400":
+          description: pc with passed id not found
+      summary: Delete Computer
+      tags:
+      - computer
+    get:
+      consumes:
+      - application/json
+      description: Get pc from database by id
+      parameters:
+      - description: Computer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PC'
+        "400":
+          description: bad id passed
+        "404":
+          description: pc with passed id not found
+      summary: Get Computer
+      tags:
+      - computer
+    post:
+      consumes:
+      - application/json
+      description: Update existing pc in database by id
+      parameters:
+      - description: Computer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: new computer or some new accessories
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.PC'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pc updated
+        "400":
+          description: pc with passed id not found
+      summary: Update Computer
+      tags:
+      - computer
+  /computers:
+    get:
+      consumes:
+      - application/json
+      description: Get all pc from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PC'
+            type: array
+        "500":
+          description: get pcs from database error
+      summary: Get Computers
+      tags:
+      - computers
+swagger: "2.0"
