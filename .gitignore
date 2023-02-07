@@ -1,5 +1,4 @@
 .idea
 .env
-
-server
-*.log
+.bin
+.logs
