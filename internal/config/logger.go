@@ -33,3 +33,18 @@ func SetupLogger(cfg *Config) {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 }
+
+// loggers for comfortable use in handlers
+func logFields(handler string) log.Fields {
+	return log.Fields{
+		"handler": handler,
+	}
+}
+
+func LogDebug(handler string, err error) {
+	log.WithFields(logFields(handler)).Debug(err)
+}
+
+func LogError(handler string, err error) {
+	log.WithFields(logFields(handler)).Error(err)
+}
