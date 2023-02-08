@@ -9,6 +9,7 @@ import (
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport"
+	"github.com/ninja-way/pc-store/pkg/hash"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -51,10 +52,13 @@ func main() {
 	}
 	defer db.Close(ctx)
 
-	// init service and http handler
 	c := cache.New()
+	h := hash.NewSHA1Hasher("test") // TODO: move salt to env file
+
+	// init services and http handler
 	compStore := service.NewComputersStore(c, cfg, db)
-	handler := transport.NewHandler(compStore)
+	usersService := service.NewUsers(db, h)
+	handler := transport.NewHandler(compStore, usersService)
 
 	// setup and run pcstore
 	transport.NewServer(

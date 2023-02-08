@@ -23,13 +23,19 @@ type ComputersStore interface {
 	DeleteComputer(context.Context, int) error
 }
 
-type Handler struct {
-	compService ComputersStore
+type Users interface {
+	SignUp(context.Context, models.SignUp) error
 }
 
-func NewHandler(compService ComputersStore) *Handler {
+type Handler struct {
+	compService ComputersStore
+	userService Users
+}
+
+func NewHandler(compService ComputersStore, userService Users) *Handler {
 	return &Handler{
 		compService: compService,
+		userService: userService,
 	}
 }
 
@@ -43,7 +49,14 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	r := gin.New()
 	r.Use(middleware.Logging())
 
-	r.GET("/computers", h.getComputers)
+	// auth
+	auth := r.Group("/auth")
+	{
+		auth.POST("/sign-up", h.signUp)
+	}
+
+	// computers
+	r.GET("/computers", h.getComputer)
 
 	comp := r.Group("/computer")
 	{

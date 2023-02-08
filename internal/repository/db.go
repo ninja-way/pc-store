@@ -7,10 +7,15 @@ import (
 
 // DB describes the repository business logic
 type DB interface {
+	// Users
+	CreateUser(context.Context, models.User) error
+
+	// Computers
 	GetComputers(context.Context) ([]models.PC, error)
 	GetComputerByID(context.Context, int) (models.PC, error)
 	AddComputer(context.Context, models.PC) (int, error)
 	UpdateComputer(context.Context, int, models.PC) error
 	DeleteComputer(context.Context, int) error
+
 	Close(context.Context) error
 }
