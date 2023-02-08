@@ -2,9 +2,18 @@
 CRUD server providing the computer store API
 
 ### Run server
-+ Define environment variables for connecting to the database in `.env` file  
-Config: [internal/config/config.go](./internal/config/config.go) 
++ Set server settings in [configs/main.yml](./configs/main.yml)
++ Define some environment variables for connecting to the database in `.env` file
+```bash
+PC_HOST=localhost
+PC_PORT=5432
+PC_USERNAME=postgres
+PC_PASSWORD=password
+PC_SSLMODE=disable
+PC_DBNAME=pcstore
+```
 
++ Run server
 ```
 make run
 ```

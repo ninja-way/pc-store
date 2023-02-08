@@ -16,7 +16,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/computer": {
-            "put": {
+            "post": {
                 "description": "Add new pc from request body to database",
                 "consumes": [
                     "application/json"
@@ -40,8 +40,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/transport.IDResponse"
                         }
@@ -92,7 +92,7 @@ const docTemplate = `{
                     }
                 }
             },
-            "post": {
+            "put": {
                 "description": "Update existing pc in database by id",
                 "consumes": [
                     "application/json"

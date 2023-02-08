@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
 	"github.com/ninja-way/pc-store/internal/transport/middleware"
 
@@ -36,9 +37,11 @@ func NewHandler(service ComputersStore) *Handler {
 }
 
 // InitRouter setup endpoints
-func (h *Handler) InitRouter() *gin.Engine {
+func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	// disable debug info
-	gin.SetMode(gin.ReleaseMode)
+	if cfg.Environment == "prod" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	r := gin.New()
 	r.Use(middleware.Logging())
@@ -47,9 +50,9 @@ func (h *Handler) InitRouter() *gin.Engine {
 
 	comp := r.Group("/computer")
 	{
-		comp.PUT("", h.addComputer)
+		comp.POST("", h.addComputer)
 		comp.GET("/:id", h.getComputer)
-		comp.POST("/:id", h.updateComputer)
+		comp.PUT("/:id", h.updateComputer)
 		comp.DELETE("/:id", h.deleteComputer)
 	}
 

@@ -59,6 +59,6 @@ func main() {
 	// setup and run pcstore
 	transport.NewServer(
 		fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
-		handler.InitRouter(),
+		handler.InitRouter(cfg),
 	).Run()
 }
