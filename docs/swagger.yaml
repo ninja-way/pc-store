@@ -40,7 +40,7 @@ info:
   version: v1.6.0
 paths:
   /computer:
-    put:
+    post:
       consumes:
       - application/json
       description: Add new pc from request body to database
@@ -54,8 +54,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/transport.IDResponse'
         "400":
@@ -110,7 +110,7 @@ paths:
       summary: Get Computer
       tags:
       - computer
-    post:
+    put:
       consumes:
       - application/json
       description: Update existing pc in database by id

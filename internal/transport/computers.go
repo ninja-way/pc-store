@@ -41,10 +41,10 @@ func (h *Handler) getComputers(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.PC	true	"computer and its accessories"
-//	@Success		200		{object}	IDResponse
+//	@Success		201		{object}	IDResponse
 //	@Failure		400		"bad request body"
 //	@Failure		500		"add pc to database error"
-//	@Router			/computer [put]
+//	@Router			/computer [post]
 func (h *Handler) addComputer(c *gin.Context) {
 	var newPC models.PC
 	if err := c.BindJSON(&newPC); err != nil {
@@ -74,7 +74,7 @@ func (h *Handler) addComputer(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 	}
 
-	c.JSON(http.StatusOK, IDResponse{id})
+	c.JSON(http.StatusCreated, IDResponse{id})
 }
 
 //	@Summary		Get Computer
@@ -122,7 +122,7 @@ func (h *Handler) getComputer(c *gin.Context) {
 //	@Failure		400		"bad id passed"
 //	@Failure		400		"bad request body"
 //	@Failure		400		"pc with passed id not found"
-//	@Router			/computer/{id} [post]
+//	@Router			/computer/{id} [put]
 func (h *Handler) updateComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
