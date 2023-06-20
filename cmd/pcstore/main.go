@@ -53,7 +53,7 @@ func main() {
 	defer db.Close(ctx)
 
 	c := cache.New()
-	h := hash.NewSHA1Hasher("test") // TODO: move salt to env file
+	h := hash.NewSHA1Hasher(cfg.DB.HashSalt)
 
 	// init services and http handler
 	compStore := service.NewComputersStore(c, cfg, db)
