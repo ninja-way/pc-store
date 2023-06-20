@@ -27,14 +27,14 @@ func parseID(s string) (int, error) {
 	return id, nil
 }
 
-// @Summary		Get Computers
-// @Description	Get all pc from database
-// @Tags			computers
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	[]models.PC
-// @Failure		500	"get pcs from database error"
-// @Router			/computers [get]
+//	@Summary		Get Computers
+//	@Description	Get all pc from database
+//	@Tags			computers
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	[]models.PC
+//	@Failure		500	"get pcs from database error"
+//	@Router			/computers [get]
 func (h *Handler) getComputers(c *gin.Context) {
 	comps, err := h.compService.GetComputers(c)
 	if err != nil {
@@ -46,16 +46,16 @@ func (h *Handler) getComputers(c *gin.Context) {
 	c.JSON(http.StatusOK, comps)
 }
 
-// @Summary		Add Computer
-// @Description	Add new pc from request body to database
-// @Tags			computer
-// @Accept			json
-// @Produce		json
-// @Param			request	body		models.PC	true	"computer and its accessories"
-// @Success		201		{object}	IDResponse
-// @Failure		400		"bad request body"
-// @Failure		500		"add pc to database error"
-// @Router			/computer [post]
+//	@Summary		Add Computer
+//	@Description	Add new pc from request body to database
+//	@Tags			computer
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		models.PC	true	"computer and its accessories"
+//	@Success		201		{object}	IDResponse
+//	@Failure		400		"bad request body"
+//	@Failure		500		"add pc to database error"
+//	@Router			/computer [post]
 func (h *Handler) addComputer(c *gin.Context) {
 	var newPC models.PC
 	if err := c.BindJSON(&newPC); err != nil {
@@ -79,16 +79,16 @@ func (h *Handler) addComputer(c *gin.Context) {
 	c.JSON(http.StatusCreated, IDResponse{id})
 }
 
-// @Summary		Get Computer
-// @Description	Get pc from database by id
-// @Tags			computer
-// @Accept			json
-// @Produce		json
-// @Param			id	path		int	true	"Computer ID"
-// @Success		200	{object}	models.PC
-// @Failure		400	"bad id passed"
-// @Failure		404	"pc with passed id not found"
-// @Router			/computer/{id} [get]
+//	@Summary		Get Computer
+//	@Description	Get pc from database by id
+//	@Tags			computer
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Computer ID"
+//	@Success		200	{object}	models.PC
+//	@Failure		400	"bad id passed"
+//	@Failure		404	"pc with passed id not found"
+//	@Router			/computer/{id} [get]
 func (h *Handler) getComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
@@ -107,18 +107,18 @@ func (h *Handler) getComputer(c *gin.Context) {
 	c.JSON(http.StatusOK, pc)
 }
 
-// @Summary		Update Computer
-// @Description	Update existing pc in database by id
-// @Tags			computer
-// @Accept			json
-// @Produce		json
-// @Param			id		path	int			true	"Computer ID"
-// @Param			request	body	models.PC	true	"new computer or some new accessories"
-// @Success		200		"pc updated"
-// @Failure		400		"bad id passed"
-// @Failure		400		"bad request body"
-// @Failure		400		"pc with passed id not found"
-// @Router			/computer/{id} [put]
+//	@Summary		Update Computer
+//	@Description	Update existing pc in database by id
+//	@Tags			computer
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	int			true	"Computer ID"
+//	@Param			request	body	models.PC	true	"new computer or some new accessories"
+//	@Success		200		"pc updated"
+//	@Failure		400		"bad id passed"
+//	@Failure		400		"bad request body"
+//	@Failure		400		"pc with passed id not found"
+//	@Router			/computer/{id} [put]
 func (h *Handler) updateComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {
@@ -145,16 +145,16 @@ func (h *Handler) updateComputer(c *gin.Context) {
 	}
 }
 
-// @Summary		Delete Computer
-// @Description	Delete pc from database by id
-// @Tags			computer
-// @Accept			json
-// @Produce		json
-// @Param			id	path	int	true	"Computer ID"
-// @Success		200	"pc deleted"
-// @Failure		400	"bad id passed"
-// @Failure		400	"pc with passed id not found"
-// @Router			/computer/{id} [delete]
+//	@Summary		Delete Computer
+//	@Description	Delete pc from database by id
+//	@Tags			computer
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path	int	true	"Computer ID"
+//	@Success		200	"pc deleted"
+//	@Failure		400	"bad id passed"
+//	@Failure		400	"pc with passed id not found"
+//	@Router			/computer/{id} [delete]
 func (h *Handler) deleteComputer(c *gin.Context) {
 	id, err := parseID(c.Param("id"))
 	if err != nil {

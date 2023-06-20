@@ -56,7 +56,7 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	}
 
 	// computers
-	r.GET("/computers", h.getComputer)
+	r.GET("/computers", h.getComputers)
 
 	comp := r.Group("/computer")
 	{
