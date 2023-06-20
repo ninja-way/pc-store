@@ -103,3 +103,5 @@ func main() {
 }
 ```
 ![example running](./cmd/server/example.png "example running")
+
+Git setting
