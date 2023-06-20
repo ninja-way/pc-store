@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	DB Postgres
+	DB DBSettings
 
 	Environment string        `mapstructure:"environment"`
 	CacheTTL    time.Duration `mapstructure:"cache_ttl"`
@@ -20,13 +20,15 @@ type Server struct {
 	Port int    `mapstructure:"port"`
 }
 
-type Postgres struct {
+type DBSettings struct {
 	Host     string
 	Port     int
 	UserName string
 	Password string
 	SSLMode  string
 	DBName   string
+	// Salt for hashes
+	HashSalt string
 }
 
 func New(folder, filename string) (*Config, error) {

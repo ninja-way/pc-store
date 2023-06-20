@@ -14,7 +14,7 @@ type PG struct {
 }
 
 // Connect makes connection to the database with the passed context
-func Connect(ctx context.Context, db *config.Postgres) (repository.DB, error) {
+func Connect(ctx context.Context, db *config.DBSettings) (repository.DB, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		db.Host, db.Port, db.UserName, db.Password, db.DBName, db.SSLMode)
 
