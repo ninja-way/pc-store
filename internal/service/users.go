@@ -21,13 +21,15 @@ type Users struct {
 	repo       UsersRepository
 	hasher     PasswordHasher
 	hmacSecret []byte
+	tokenTTL   time.Duration
 }
 
-func NewUsers(repo UsersRepository, hasher PasswordHasher, secret []byte) *Users {
+func NewUsers(repo UsersRepository, hasher PasswordHasher, secret []byte, ttl time.Duration) *Users {
 	return &Users{
 		repo:       repo,
 		hasher:     hasher,
 		hmacSecret: secret,
+		tokenTTL:   ttl,
 	}
 }
 
@@ -61,7 +63,7 @@ func (u *Users) SignIn(ctx context.Context, inp models.SignIn) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Subject:   strconv.Itoa(user.ID),
 		IssuedAt:  &jwt.NumericDate{Time: time.Now()},
-		ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(time.Minute * 30)}, // TODO: move to config
+		ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(u.tokenTTL)},
 	})
 
 	return token.SignedString(u.hmacSecret)

@@ -53,11 +53,11 @@ func main() {
 	defer db.Close(ctx)
 
 	c := cache.New()
-	h := hash.NewSHA1Hasher(cfg.DB.HashSalt)
+	h := hash.NewSHA1Hasher(cfg.Service.HashSalt)
 
 	// init services and http handler
 	compStore := service.NewComputersStore(c, cfg, db)
-	usersService := service.NewUsers(db, h, []byte(cfg.TokenSecret))
+	usersService := service.NewUsers(db, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
 	handler := transport.NewHandler(compStore, usersService)
 
 	// setup and run pcstore

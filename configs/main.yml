@@ -1,8 +1,9 @@
-token_secret: 2
-
 environment: prod
 
 cache_ttl: 60s
+
+auth:
+  token_ttl: 30m
 
 server:
   host: localhost
