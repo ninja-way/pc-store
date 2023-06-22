@@ -27,3 +27,26 @@ func (h *Handler) signUp(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 	}
 }
+
+func (h *Handler) signIn(c *gin.Context) {
+	var signIn models.SignIn
+	if err := c.BindJSON(&signIn); err != nil {
+		config.LogDebug("signIn", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	if err := signIn.Validate(); err != nil {
+		config.LogDebug("signIn", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.userService.SignIn(c, signIn)
+	if err != nil {
+		config.LogError("signIn", err)
+		c.Status(http.StatusInternalServerError)
+	}
+
+	c.JSON(http.StatusOK, map[string]string{"token": token})
+}

@@ -9,6 +9,8 @@ import (
 type Config struct {
 	DB DBSettings
 
+	TokenSecret string `mapstructure:"token_secret"`
+
 	Environment string        `mapstructure:"environment"`
 	CacheTTL    time.Duration `mapstructure:"cache_ttl"`
 

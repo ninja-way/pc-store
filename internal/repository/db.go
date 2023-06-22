@@ -9,6 +9,7 @@ import (
 type DB interface {
 	// Users
 	CreateUser(context.Context, models.User) error
+	GetUser(context.Context, string, string) (models.User, error)
 
 	// Computers
 	GetComputers(context.Context) ([]models.PC, error)

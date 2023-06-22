@@ -1,3 +1,5 @@
+token_secret: 2
+
 environment: prod
 
 cache_ttl: 60s
