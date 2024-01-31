@@ -1,5 +1,5 @@
 CREATE TABLE pc (
-    id integer NOT NULL,
+    id serial primary key NOT NULL,
     name character varying(255) NOT NULL,
     cpu character varying(255) NOT NULL,
     videocard character varying(255),

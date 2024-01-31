@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
@@ -44,8 +45,14 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, err := h.userService.SignIn(c, signIn)
 	if err != nil {
+		if errors.Is(err, models.ErrUserNotFound) {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+
 		config.LogError("signIn", err)
 		c.Status(http.StatusInternalServerError)
+		return
 	}
 
 	c.JSON(http.StatusOK, map[string]string{"token": token})
