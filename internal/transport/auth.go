@@ -10,6 +10,17 @@ import (
 )
 
 // TODO: return info message if sign up not successful
+
+// @Summary		Sign Up
+// @Description	Sign up new user
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body	models.SignUp	true	"sign up info"
+// @Success		200		"OK"
+// @Failure		400		"bad request body"
+// @Failure		500		"sign up error"
+// @Router			/auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var signUp models.SignUp
 	if err := c.BindJSON(&signUp); err != nil {
@@ -30,6 +41,16 @@ func (h *Handler) signUp(c *gin.Context) {
 	}
 }
 
+// @Summary		Sign In
+// @Description	Sign in user
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body	models.SignIn	true	"sign in info"
+// @Success		200		"OK"
+// @Failure		400		"bad request body"
+// @Failure		500		"sign in error"
+// @Router			/auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var signIn models.SignIn
 	if err := c.BindJSON(&signIn); err != nil {
@@ -60,6 +81,15 @@ func (h *Handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]string{"token": accessToken})
 }
 
+// @Summary		Refresh Tokens
+// @Description	Refresh access and refresh tokens
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Success		200	"OK"
+// @Failure		400	"bad request body"
+// @Failure		500	"refresh tokens error"
+// @Router			/auth/refresh [get]
 func (h *Handler) refresh(c *gin.Context) {
 	cookie, err := c.Cookie("refresh-token")
 	if err != nil {

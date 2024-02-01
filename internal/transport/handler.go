@@ -54,7 +54,7 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	auth := r.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
-		auth.GET("/sign-in", h.signIn)
+		auth.POST("/sign-in", h.signIn)
 		auth.GET("/refresh", h.refresh)
 	}
 
@@ -63,9 +63,9 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	comp.Use(h.Auth())
 	{
 		comp.GET("", h.getComputers)
-		comp.POST("", h.addComputer)
+		comp.PUT("", h.addComputer)
 		comp.GET("/:id", h.getComputer)
-		comp.PUT("/:id", h.updateComputer)
+		comp.POST("/:id", h.updateComputer)
 		comp.DELETE("/:id", h.deleteComputer)
 	}
 

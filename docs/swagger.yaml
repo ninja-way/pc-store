@@ -27,6 +27,32 @@ definitions:
         example: RTX
         type: string
     type: object
+  models.SignIn:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.SignUp:
+    properties:
+      email:
+        type: string
+      name:
+        minLength: 2
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   transport.IDResponse:
     properties:
       id:
@@ -37,10 +63,95 @@ host: localhost:8080
 info:
   contact: {}
   title: Computer store API
-  version: v1.6.0
+  version: v1.8.0
 paths:
-  /computer:
+  /auth/refresh:
+    get:
+      consumes:
+      - application/json
+      description: Refresh access and refresh tokens
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: bad request body
+        "500":
+          description: refresh tokens error
+      summary: Refresh Tokens
+      tags:
+      - auth
+  /auth/sign-in:
     post:
+      consumes:
+      - application/json
+      description: Sign in user
+      parameters:
+      - description: sign in info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: bad request body
+        "500":
+          description: sign in error
+      summary: Sign In
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Sign up new user
+      parameters:
+      - description: sign up info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: bad request body
+        "500":
+          description: sign up error
+      summary: Sign Up
+      tags:
+      - auth
+  /computers:
+    get:
+      consumes:
+      - application/json
+      description: Get all pc from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PC'
+            type: array
+        "500":
+          description: get pcs from database error
+      security:
+      - BearerAuth: []
+      summary: Get Computers
+      tags:
+      - computers
+    put:
       consumes:
       - application/json
       description: Add new pc from request body to database
@@ -62,10 +173,12 @@ paths:
           description: bad request body
         "500":
           description: add pc to database error
+      security:
+      - BearerAuth: []
       summary: Add Computer
       tags:
-      - computer
-  /computer/{id}:
+      - computers
+  /computers/{id}:
     delete:
       consumes:
       - application/json
@@ -83,9 +196,11 @@ paths:
           description: pc deleted
         "400":
           description: pc with passed id not found
+      security:
+      - BearerAuth: []
       summary: Delete Computer
       tags:
-      - computer
+      - computers
     get:
       consumes:
       - application/json
@@ -107,10 +222,12 @@ paths:
           description: bad id passed
         "404":
           description: pc with passed id not found
+      security:
+      - BearerAuth: []
       summary: Get Computer
       tags:
-      - computer
-    put:
+      - computers
+    post:
       consumes:
       - application/json
       description: Update existing pc in database by id
@@ -133,26 +250,14 @@ paths:
           description: pc updated
         "400":
           description: pc with passed id not found
+      security:
+      - BearerAuth: []
       summary: Update Computer
       tags:
-      - computer
-  /computers:
-    get:
-      consumes:
-      - application/json
-      description: Get all pc from database
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.PC'
-            type: array
-        "500":
-          description: get pcs from database error
-      summary: Get Computers
-      tags:
       - computers
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

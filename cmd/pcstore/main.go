@@ -13,11 +13,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//	@title		Computer store API
-//	@version	v1.6.0
+//	@title						Computer store API
+//	@version					v1.8.0
 //
-//	@host		localhost:8080
-//	@BasePath	/
+//	@host						localhost:8080
+//	@BasePath					/
+//
+//	@securityDefinitions.apiKey	BearerAuth
+//	@in							header
+//	@name						Authorization
 
 const (
 	ConfigDir  = "configs"

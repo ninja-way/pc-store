@@ -3,13 +3,150 @@
     "info": {
         "title": "Computer store API",
         "contact": {},
-        "version": "v1.6.0"
+        "version": "v1.8.0"
     },
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
-        "/computer": {
+        "/auth/refresh": {
+            "get": {
+                "description": "Refresh access and refresh tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh Tokens",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "bad request body"
+                    },
+                    "500": {
+                        "description": "refresh tokens error"
+                    }
+                }
+            }
+        },
+        "/auth/sign-in": {
             "post": {
+                "description": "Sign in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign In",
+                "parameters": [
+                    {
+                        "description": "sign in info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "bad request body"
+                    },
+                    "500": {
+                        "description": "sign in error"
+                    }
+                }
+            }
+        },
+        "/auth/sign-up": {
+            "post": {
+                "description": "Sign up new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign Up",
+                "parameters": [
+                    {
+                        "description": "sign up info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignUp"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "bad request body"
+                    },
+                    "500": {
+                        "description": "sign up error"
+                    }
+                }
+            }
+        },
+        "/computers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all pc from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "computers"
+                ],
+                "summary": "Get Computers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PC"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "get pcs from database error"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add new pc from request body to database",
                 "consumes": [
                     "application/json"
@@ -18,7 +155,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "computer"
+                    "computers"
                 ],
                 "summary": "Add Computer",
                 "parameters": [
@@ -48,8 +185,13 @@
                 }
             }
         },
-        "/computer/{id}": {
+        "/computers/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get pc from database by id",
                 "consumes": [
                     "application/json"
@@ -58,7 +200,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "computer"
+                    "computers"
                 ],
                 "summary": "Get Computer",
                 "parameters": [
@@ -85,7 +227,12 @@
                     }
                 }
             },
-            "put": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update existing pc in database by id",
                 "consumes": [
                     "application/json"
@@ -94,7 +241,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "computer"
+                    "computers"
                 ],
                 "summary": "Update Computer",
                 "parameters": [
@@ -125,6 +272,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete pc from database by id",
                 "consumes": [
                     "application/json"
@@ -133,7 +285,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "computer"
+                    "computers"
                 ],
                 "summary": "Delete Computer",
                 "parameters": [
@@ -151,35 +303,6 @@
                     },
                     "400": {
                         "description": "pc with passed id not found"
-                    }
-                }
-            }
-        },
-        "/computers": {
-            "get": {
-                "description": "Get all pc from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "computers"
-                ],
-                "summary": "Get Computers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.PC"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "get pcs from database error"
                     }
                 }
             }
@@ -223,6 +346,43 @@
                 }
             }
         },
+        "models.SignIn": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                }
+            }
+        },
+        "models.SignUp": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                }
+            }
+        },
         "transport.IDResponse": {
             "type": "object",
             "properties": {
@@ -231,6 +391,13 @@
                     "example": 1
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
