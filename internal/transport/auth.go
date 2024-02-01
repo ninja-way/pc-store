@@ -2,6 +2,7 @@ package transport
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
@@ -43,7 +44,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.userService.SignIn(c, signIn)
+	accessToken, refreshToken, err := h.userService.SignIn(c, signIn)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -55,5 +56,25 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]string{"token": token})
+	c.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
+	c.JSON(http.StatusOK, map[string]string{"token": accessToken})
+}
+
+func (h *Handler) refresh(c *gin.Context) {
+	cookie, err := c.Cookie("refresh-token")
+	if err != nil {
+		config.LogDebug("refresh", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	accessToken, refreshToken, err := h.userService.RefreshTokens(c, cookie)
+	if err != nil {
+		config.LogDebug("refresh", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
+	c.JSON(http.StatusOK, map[string]string{"token": accessToken})
 }

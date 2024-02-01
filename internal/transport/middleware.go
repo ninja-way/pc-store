@@ -37,7 +37,7 @@ func Auth() gin.HandlerFunc {
 		}
 
 		var userService Users
-		userID, err := userService.ParseToken(token)
+		userID, err := userService.ParseToken(c, token)
 		if err != nil {
 			config.LogDebug("authMiddleware", err)
 			c.Status(http.StatusUnauthorized)

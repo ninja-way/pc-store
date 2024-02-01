@@ -57,7 +57,7 @@ func main() {
 
 	// init services and http handler
 	compStore := service.NewComputersStore(c, cfg, db)
-	usersService := service.NewUsers(db, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
+	usersService := service.NewUsers(db, db, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
 	handler := transport.NewHandler(compStore, usersService)
 
 	// setup and run pcstore

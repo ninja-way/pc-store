@@ -23,8 +23,9 @@ type ComputersStore interface {
 
 type Users interface {
 	SignUp(context.Context, models.SignUp) error
-	SignIn(context.Context, models.SignIn) (string, error)
-	ParseToken(string) (int64, error)
+	SignIn(context.Context, models.SignIn) (string, string, error)
+	ParseToken(context.Context, string) (int64, error)
+	RefreshTokens(context.Context, string) (string, string, error)
 }
 
 type Handler struct {
@@ -54,6 +55,7 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.GET("/sign-in", h.signIn)
+		auth.GET("/refresh", h.refresh)
 	}
 
 	// computers
