@@ -9,6 +9,11 @@ import (
 type DB interface {
 	// Users
 	CreateUser(context.Context, models.User) error
+	GetUser(context.Context, string, string) (models.User, error)
+
+	// Tokens
+	CreateToken(context.Context, models.RefreshSession) error
+	GetToken(context.Context, string) (models.RefreshSession, error)
 
 	// Computers
 	GetComputers(context.Context) ([]models.PC, error)

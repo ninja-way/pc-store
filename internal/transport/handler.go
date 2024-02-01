@@ -3,11 +3,9 @@ package transport
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	_ "github.com/ninja-way/pc-store/docs"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
-	"github.com/ninja-way/pc-store/internal/transport/middleware"
-
-	_ "github.com/ninja-way/pc-store/docs"
 	swaggerFiles "github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 )
@@ -25,6 +23,9 @@ type ComputersStore interface {
 
 type Users interface {
 	SignUp(context.Context, models.SignUp) error
+	SignIn(context.Context, models.SignIn) (string, string, error)
+	ParseToken(context.Context, string) (int64, error)
+	RefreshTokens(context.Context, string) (string, string, error)
 }
 
 type Handler struct {
@@ -47,19 +48,21 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 	}
 
 	r := gin.New()
-	r.Use(middleware.Logging())
+	r.Use(Logging())
 
 	// auth
 	auth := r.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
+		auth.GET("/sign-in", h.signIn)
+		auth.GET("/refresh", h.refresh)
 	}
 
 	// computers
-	r.GET("/computers", h.getComputers)
-
-	comp := r.Group("/computer")
+	comp := r.Group("/computers")
+	comp.Use(Auth())
 	{
+		comp.GET("", h.getComputers)
 		comp.POST("", h.addComputer)
 		comp.GET("/:id", h.getComputer)
 		comp.PUT("/:id", h.updateComputer)

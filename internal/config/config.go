@@ -7,10 +7,14 @@ import (
 )
 
 type Config struct {
+	Service ServiceSettings
+
 	DB DBSettings
 
 	Environment string        `mapstructure:"environment"`
 	CacheTTL    time.Duration `mapstructure:"cache_ttl"`
+
+	Auth Auth `mapstructure:"auth"`
 
 	Server Server `mapstructure:"server"`
 }
@@ -20,6 +24,15 @@ type Server struct {
 	Port int    `mapstructure:"port"`
 }
 
+type ServiceSettings struct {
+	HashSalt    string
+	TokenSecret string
+}
+
+type Auth struct {
+	TokenTTL time.Duration `mapstructure:"token_ttl"`
+}
+
 type DBSettings struct {
 	Host     string
 	Port     int
@@ -27,8 +40,6 @@ type DBSettings struct {
 	Password string
 	SSLMode  string
 	DBName   string
-	// Salt for hashes
-	HashSalt string
 }
 
 func New(folder, filename string) (*Config, error) {
@@ -42,6 +53,10 @@ func New(folder, filename string) (*Config, error) {
 	}
 
 	if err := viper.Unmarshal(cfg); err != nil {
+		return nil, err
+	}
+
+	if err := envconfig.Process("pc_service", &cfg.Service); err != nil {
 		return nil, err
 	}
 

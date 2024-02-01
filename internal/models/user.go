@@ -29,3 +29,12 @@ type SignUp struct {
 func (s SignUp) Validate() error {
 	return validate.Struct(s)
 }
+
+type SignIn struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,gte=6"`
+}
+
+func (s SignIn) Validate() error {
+	return validate.Struct(s)
+}
