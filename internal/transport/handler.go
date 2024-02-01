@@ -60,7 +60,7 @@ func (h *Handler) InitRouter(cfg *config.Config) *gin.Engine {
 
 	// computers
 	comp := r.Group("/computers")
-	comp.Use(Auth())
+	comp.Use(h.Auth())
 	{
 		comp.GET("", h.getComputers)
 		comp.POST("", h.addComputer)

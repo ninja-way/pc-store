@@ -27,20 +27,21 @@ func Logging() gin.HandlerFunc {
 	}
 }
 
-func Auth() gin.HandlerFunc {
+func (h *Handler) Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := getTokenFromRequest(c)
 		if err != nil {
 			config.LogDebug("authMiddleware", err)
 			c.Status(http.StatusUnauthorized)
+			c.Abort()
 			return
 		}
 
-		var userService Users
-		userID, err := userService.ParseToken(c, token)
+		userID, err := h.userService.ParseToken(c, token)
 		if err != nil {
 			config.LogDebug("authMiddleware", err)
 			c.Status(http.StatusUnauthorized)
+			c.Abort()
 			return
 		}
 
