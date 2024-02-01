@@ -11,8 +11,9 @@ PC_USERNAME=postgres
 PC_PASSWORD=password
 PC_SSLMODE=disable
 PC_DBNAME=pcstore
-/* Salt for hashing */
-PC_HASHSALT=test
+
+PC_SERVICE_HASHSALT=test
+PC_SERVICE_TOKENSECRET=test
 ```
 
 + Run server
