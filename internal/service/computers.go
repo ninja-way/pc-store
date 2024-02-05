@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ninja-way/cache-ninja/pkg/cache"
-	audit "github.com/ninja-way/grpc-audit-log/pkg/models"
+	audit "github.com/ninja-way/mq-audit-log/pkg/models"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
 	"time"
@@ -49,7 +49,7 @@ func (c *ComputersStore) GetComputers(ctx context.Context) ([]models.PC, error) 
 		EntityID:  0,
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("getComputers", err)
+		return nil, err
 	}
 
 	return comps, nil
@@ -75,7 +75,7 @@ func (c *ComputersStore) GetComputerByID(ctx context.Context, id int) (models.PC
 		EntityID:  int64(gotPc.ID),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("getComputer", err)
+		return models.PC{}, err
 	}
 
 	return gotPc, nil
@@ -110,7 +110,7 @@ func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) (int, er
 		EntityID:  int64(pc.ID),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("addComputer", err)
+		return 0, err
 	}
 
 	return id, nil
@@ -159,7 +159,7 @@ func (c *ComputersStore) UpdateComputer(ctx context.Context, id int, newPC model
 		EntityID:  int64(pc.ID),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("updateComputer", err)
+		return err
 	}
 
 	return nil
@@ -177,7 +177,7 @@ func (c *ComputersStore) DeleteComputer(ctx context.Context, id int) error {
 		EntityID:  int64(id),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("deleteComputer", err)
+		return err
 	}
 
 	return nil

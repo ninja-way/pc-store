@@ -9,7 +9,8 @@ import (
 type Config struct {
 	Service ServiceSettings
 
-	DB DBSettings
+	DB    DBSettings
+	Audit AuditClient
 
 	Environment string        `mapstructure:"environment"`
 	CacheTTL    time.Duration `mapstructure:"cache_ttl"`
@@ -27,6 +28,10 @@ type Server struct {
 type ServiceSettings struct {
 	HashSalt    string
 	TokenSecret string
+}
+
+type AuditClient struct {
+	URI string
 }
 
 type Auth struct {
@@ -61,6 +66,10 @@ func New(folder, filename string) (*Config, error) {
 	}
 
 	if err := envconfig.Process("pc", &cfg.DB); err != nil {
+		return nil, err
+	}
+
+	if err := envconfig.Process("amqp", &cfg.Audit); err != nil {
 		return nil, err
 	}
 
