@@ -6,39 +6,31 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
+	audit "github.com/ninja-way/grpc-audit-log/pkg/models"
+	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
 	"math/rand"
 	"strconv"
 	"time"
 )
 
-type PasswordHasher interface {
-	Hash(password string) (string, error)
-}
-
-type UsersRepository interface {
-	CreateUser(context.Context, models.User) error
-	GetUser(context.Context, string, string) (models.User, error)
-}
-
-type SessionsRepository interface {
-	CreateToken(ctx context.Context, token models.RefreshSession) error
-	GetToken(ctx context.Context, token string) (models.RefreshSession, error)
-}
-
 type Users struct {
 	repo         UsersRepository
 	sessionsRepo SessionsRepository
+
+	auditLog AuditClient
 
 	hasher     PasswordHasher
 	hmacSecret []byte
 	tokenTTL   time.Duration
 }
 
-func NewUsers(repo UsersRepository, sessionsRepo SessionsRepository, hasher PasswordHasher, secret []byte, ttl time.Duration) *Users {
+func NewUsers(repo UsersRepository, sessionsRepo SessionsRepository, auditClient AuditClient,
+	hasher PasswordHasher, secret []byte, ttl time.Duration) *Users {
 	return &Users{
 		repo:         repo,
 		sessionsRepo: sessionsRepo,
+		auditLog:     auditClient,
 		hasher:       hasher,
 		hmacSecret:   secret,
 		tokenTTL:     ttl,
@@ -58,7 +50,25 @@ func (u *Users) SignUp(ctx context.Context, inp models.SignUp) error {
 		RegisteredAt: time.Now(),
 	}
 
-	return u.repo.CreateUser(ctx, user)
+	if err = u.repo.CreateUser(ctx, user); err != nil {
+		return err
+	}
+
+	user, err = u.repo.GetUser(ctx, inp.Email, password)
+	if err != nil {
+		return err
+	}
+
+	if err = u.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_REGISTER,
+		Entity:    audit.ENTITY_USER,
+		EntityID:  int64(user.ID),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("signUp", err)
+	}
+
+	return nil
 }
 
 func (u *Users) SignIn(ctx context.Context, inp models.SignIn) (string, string, error) {
@@ -73,6 +83,15 @@ func (u *Users) SignIn(ctx context.Context, inp models.SignIn) (string, string, 
 			return "", "", models.ErrUserNotFound
 		}
 		return "", "", err
+	}
+
+	if err = u.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_LOGIN,
+		Entity:    audit.ENTITY_USER,
+		EntityID:  int64(user.ID),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("signIn", err)
 	}
 
 	return u.generateTokens(ctx, user.ID)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ninja-way/cache-ninja/pkg/cache"
+	audit "github.com/ninja-way/grpc-audit-log/pkg/models"
 	"github.com/ninja-way/pc-store/internal/config"
 	"github.com/ninja-way/pc-store/internal/models"
 	"time"
@@ -19,32 +20,39 @@ var (
 	ErrFewComponents = errors.New("not all pc components listed")
 )
 
-// ComputerRepository is data layer entity
-type ComputerRepository interface {
-	GetComputers(context.Context) ([]models.PC, error)
-	GetComputerByID(context.Context, int) (models.PC, error)
-	AddComputer(context.Context, models.PC) (int, error)
-	UpdateComputer(context.Context, int, models.PC) error
-	DeleteComputer(context.Context, int) error
-}
-
 type ComputersStore struct {
-	repo ComputerRepository
+	repo     ComputerRepository
+	auditLog AuditClient
 
 	cfg   *config.Config
 	cache *cache.Cache
 }
 
-func NewComputersStore(c *cache.Cache, cfg *config.Config, repo ComputerRepository) *ComputersStore {
+func NewComputersStore(c *cache.Cache, cfg *config.Config, repo ComputerRepository, auditClient AuditClient) *ComputersStore {
 	return &ComputersStore{
-		repo:  repo,
-		cfg:   cfg,
-		cache: c,
+		repo:     repo,
+		auditLog: auditClient,
+		cfg:      cfg,
+		cache:    c,
 	}
 }
 
 func (c *ComputersStore) GetComputers(ctx context.Context) ([]models.PC, error) {
-	return c.repo.GetComputers(ctx)
+	comps, err := c.repo.GetComputers(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = c.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_GET,
+		Entity:    audit.ENTITY_COMPUTER,
+		EntityID:  0,
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("getComputers", err)
+	}
+
+	return comps, nil
 }
 
 func (c *ComputersStore) GetComputerByID(ctx context.Context, id int) (models.PC, error) {
@@ -59,7 +67,18 @@ func (c *ComputersStore) GetComputerByID(ctx context.Context, id int) (models.PC
 	}
 
 	c.cache.Set(fmt.Sprintf("%d", id), pc, c.cfg.CacheTTL)
-	return pc.(models.PC), nil
+	gotPc := pc.(models.PC)
+
+	if err = c.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_GET,
+		Entity:    audit.ENTITY_COMPUTER,
+		EntityID:  int64(gotPc.ID),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("getComputer", err)
+	}
+
+	return gotPc, nil
 }
 
 func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) (int, error) {
@@ -84,6 +103,16 @@ func (c *ComputersStore) AddComputer(ctx context.Context, pc models.PC) (int, er
 	// add to cache
 	pc.ID = id
 	c.cache.Set(fmt.Sprintf("%d", id), pc, c.cfg.CacheTTL)
+
+	if err = c.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_CREATE,
+		Entity:    audit.ENTITY_COMPUTER,
+		EntityID:  int64(pc.ID),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("addComputer", err)
+	}
+
 	return id, nil
 }
 
@@ -123,9 +152,33 @@ func (c *ComputersStore) UpdateComputer(ctx context.Context, id int, newPC model
 	}
 
 	c.cache.Set(fmt.Sprintf("%d", id), pc, c.cfg.CacheTTL)
+
+	if err = c.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_UPDATE,
+		Entity:    audit.ENTITY_COMPUTER,
+		EntityID:  int64(pc.ID),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("updateComputer", err)
+	}
+
 	return nil
 }
 
 func (c *ComputersStore) DeleteComputer(ctx context.Context, id int) error {
-	return c.repo.DeleteComputer(ctx, id)
+	err := c.repo.DeleteComputer(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if err = c.auditLog.SendLogRequest(ctx, audit.LogItem{
+		Action:    audit.ACTION_DELETE,
+		Entity:    audit.ENTITY_COMPUTER,
+		EntityID:  int64(id),
+		Timestamp: time.Now(),
+	}); err != nil {
+		config.LogError("deleteComputer", err)
+	}
+
+	return nil
 }

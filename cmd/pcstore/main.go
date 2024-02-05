@@ -9,6 +9,7 @@ import (
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport"
+	grpcClient "github.com/ninja-way/pc-store/internal/transport/grpc"
 	"github.com/ninja-way/pc-store/pkg/hash"
 	log "github.com/sirupsen/logrus"
 )
@@ -60,8 +61,13 @@ func main() {
 	h := hash.NewSHA1Hasher(cfg.Service.HashSalt)
 
 	// init services and http handler
-	compStore := service.NewComputersStore(c, cfg, db)
-	usersService := service.NewUsers(db, db, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
+	auditClient, err := grpcClient.NewClient(9000)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	usersService := service.NewUsers(db, db, auditClient, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
+	compStore := service.NewComputersStore(c, cfg, db, auditClient)
 	handler := transport.NewHandler(compStore, usersService)
 
 	// setup and run pcstore
