@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	audit "github.com/ninja-way/grpc-audit-log/pkg/models"
+	audit "github.com/ninja-way/mq-audit-log/pkg/models"
 	"github.com/ninja-way/pc-store/internal/models"
 )
 

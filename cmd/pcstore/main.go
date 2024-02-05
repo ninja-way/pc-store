@@ -9,7 +9,7 @@ import (
 	"github.com/ninja-way/pc-store/internal/repository/postgres"
 	"github.com/ninja-way/pc-store/internal/service"
 	"github.com/ninja-way/pc-store/internal/transport"
-	grpcClient "github.com/ninja-way/pc-store/internal/transport/grpc"
+	"github.com/ninja-way/pc-store/internal/transport/rabbitmq"
 	"github.com/ninja-way/pc-store/pkg/hash"
 	log "github.com/sirupsen/logrus"
 )
@@ -61,10 +61,11 @@ func main() {
 	h := hash.NewSHA1Hasher(cfg.Service.HashSalt)
 
 	// init services and http handler
-	auditClient, err := grpcClient.NewClient(9000)
+	auditClient, err := rabbitmq.NewClient(cfg.Audit.URI)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer auditClient.CloseConnection()
 
 	usersService := service.NewUsers(db, db, auditClient, h, []byte(cfg.Service.TokenSecret), cfg.Auth.TokenTTL)
 	compStore := service.NewComputersStore(c, cfg, db, auditClient)

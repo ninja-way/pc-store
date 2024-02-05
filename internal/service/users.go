@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
-	audit "github.com/ninja-way/grpc-audit-log/pkg/models"
-	"github.com/ninja-way/pc-store/internal/config"
+	audit "github.com/ninja-way/mq-audit-log/pkg/models"
 	"github.com/ninja-way/pc-store/internal/models"
 	"math/rand"
 	"strconv"
@@ -65,7 +64,7 @@ func (u *Users) SignUp(ctx context.Context, inp models.SignUp) error {
 		EntityID:  int64(user.ID),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("signUp", err)
+		return err
 	}
 
 	return nil
@@ -91,7 +90,7 @@ func (u *Users) SignIn(ctx context.Context, inp models.SignIn) (string, string, 
 		EntityID:  int64(user.ID),
 		Timestamp: time.Now(),
 	}); err != nil {
-		config.LogError("signIn", err)
+		return "", "", err
 	}
 
 	return u.generateTokens(ctx, user.ID)
