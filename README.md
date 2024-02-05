@@ -14,6 +14,8 @@ PC_DBNAME=pcstore
 
 PC_SERVICE_HASHSALT=test
 PC_SERVICE_TOKENSECRET=test
+
+AMQP_URI=amqp://guest:guest@localhost:5672/
 ```
 
 + Run server
